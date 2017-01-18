@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Assist</string>
+    <string name="password_hint">Ваш пароль</string>
+    <string name="login_hint">Ваш логин</string>
+<string-array name="themes_array">
+    <item>Системное строение общества</item>
+    <item>Основные институты общества</item>
+    <item>Общественный прогресс. Исторические типы обществ</item>
+    <item>Угрозы XXI века (глобальные проблемы)</item>
+    <item>Формы и разновидности культуры</item>
+    <item>Виды знаний и понятие истины</item>
+    <item>Экономика и экономические системы — Смешанная рыночная экономика. Роль государства в экономике</item>
+    <item>Деньги</item>
+    <item>Банковская система. Финансовые институты</item>
+    <item>Налоги</item>
+    <item>Социальные группы. Социальная мобильность и стратификация</item>
+    <item>Семья и брак. Семейное право</item>
+    <item>Свобода и ответственность</item>
+</string-array>
+
+
+</resources>
