@@ -8,18 +8,14 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,6 +30,14 @@ public class MainActivity extends AppCompatActivity {
     LinearLayoutManager linearLayoutManager;
     Dialog dialog;
 
+    ThemeAdapter.Callback callback = new ThemeAdapter.Callback() {
+        @Override
+        public void clickElement(int id) {
+//            SQLite.delete().from(Theme.class).where()
+            //код удаления записи из базы по id
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         Log.d(TAG, "onCreate: " + "вызван");
-        adapter = new ThemeAdapter();
+        adapter = new ThemeAdapter(callback);
 
         linearLayoutManager = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(linearLayoutManager);
@@ -57,14 +61,14 @@ public class MainActivity extends AppCompatActivity {
 
                         Log.d(TAG, "onClick: " + theme);
 
-//                        Theme newTheme = new Theme();
-//                        newTheme.setName(theme);
-//                        newTheme.save();
-//
-//                        Toast.makeText(MainActivity.this, "Тема добавлена!", Toast.LENGTH_SHORT).show();
-//
-//                        List<Theme> themeList = SQLite.select().from(Theme.class).queryList();
-//                        Log.d(TAG, "onClick: " + themeList.size());
+                        Theme newTheme = new Theme();
+                        newTheme.setName(theme);
+                        newTheme.save();
+
+                        Toast.makeText(MainActivity.this, "Тема добавлена!", Toast.LENGTH_SHORT).show();
+
+                        ArrayList<Theme> themeList = (ArrayList<Theme>) SQLite.select().from(Theme.class).queryList();
+                        adapter.setDatasetList(themeList);
                     }
                 };
         dialog = new AlertDialog.Builder(this)
@@ -75,14 +79,8 @@ public class MainActivity extends AppCompatActivity {
                 .setNegativeButton("Отмена", null)
                 .create();
 
-
-        ArrayList<String> arrayList = new ArrayList<String>();
-        String[] themes = this.getResources().getStringArray(R.array.themes_array);
-
-        for (int i = 0; i < themes.length; i++) {
-            arrayList.add(themes[i]);
-        }
-        adapter.setDatasetList(arrayList);
+        ArrayList<Theme> themeList = (ArrayList<Theme>) SQLite.select().from(Theme.class).queryList();
+        adapter.setDatasetList(themeList);
     }
 
     @Override
