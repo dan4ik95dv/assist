@@ -19,7 +19,14 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import ru.dvfu.AssistApi;
 import ru.dvfu.assist.model.Theme;
+import ru.dvfu.assist.model.ThemeSuccess;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -29,12 +36,14 @@ public class MainActivity extends AppCompatActivity {
     ThemeAdapter adapter;
     LinearLayoutManager linearLayoutManager;
     Dialog dialog;
+    Retrofit retrofit;
+    AssistApi assistApi;
+    String token;
 
     ThemeAdapter.Callback callback = new ThemeAdapter.Callback() {
         @Override
         public void clickElement(int id) {
-//            SQLite.delete().from(Theme.class).where()
-            //код удаления записи из базы по id
+            Toast.makeText(MainActivity.this, "Запись была удалена!", Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -42,10 +51,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        token = getIntent().getStringExtra("TOKEN");
+
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         Log.d(TAG, "onCreate: " + "вызван");
         adapter = new ThemeAdapter(callback);
+
+        retrofit = new Retrofit.Builder()
+                .baseUrl("http://private-32252-assist3.apiary-mock.com")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        assistApi = retrofit.create(AssistApi.class);
 
         linearLayoutManager = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(linearLayoutManager);
@@ -79,8 +97,20 @@ public class MainActivity extends AppCompatActivity {
                 .setNegativeButton("Отмена", null)
                 .create();
 
-        ArrayList<Theme> themeList = (ArrayList<Theme>) SQLite.select().from(Theme.class).queryList();
-        adapter.setDatasetList(themeList);
+//        ArrayList<Theme> themeList = (ArrayList<Theme>) SQLite.select().from(Theme.class).queryList();
+        assistApi.themes(token).enqueue(new Callback<ThemeSuccess>() {
+            @Override
+            public void onResponse(Call<ThemeSuccess> call, Response<ThemeSuccess> response) {
+                ArrayList<Theme> themeList = response.body().getThemes().getThemesList();
+                adapter.setDatasetList(themeList);
+            }
+
+            @Override
+            public void onFailure(Call<ThemeSuccess> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "Произошла ошибка" + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+//
     }
 
     @Override
@@ -98,4 +128,5 @@ public class MainActivity extends AppCompatActivity {
         }
         return true;
     }
+
 }
